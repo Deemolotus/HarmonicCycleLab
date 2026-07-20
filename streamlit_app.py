@@ -1,4 +1,4 @@
-"""Quant Sniper Ultimate v8.0 — Streamlit web app for Streamlit Community Cloud."""
+"""CycleAnalysis — Streamlit web app for cycle & indicator charts."""
 
 from __future__ import annotations
 
@@ -106,7 +106,7 @@ def run_analysis(params: AnalysisParams) -> dict:
     )
     cmf_val = qe.chaikin_money_flow(close, high, low, volume)
 
-    trade_advice = qe.analyze_trade_state(close, low, high, trend, st_line, sigs, sqz_val, cmf_val)
+    trade_advice = qe.analyze_trade_state(close, low, high, trend, st_line, sigs, sqz_val, cmf_val, cycle_metrics=m)
     log.append(trade_advice)
 
     fig = qe.build_plotly_chart(
@@ -127,8 +127,8 @@ def run_analysis(params: AnalysisParams) -> dict:
 
 
 def build_sidebar() -> AnalysisParams | None:
-    st.sidebar.title("Ultimate Quant Sniper")
-    st.sidebar.caption("v8.0 — Dynamic Frequency Extraction (DFE)")
+    st.sidebar.title("CycleAnalysis")
+    st.sidebar.caption("Cycle detection · TD Sequential · indicators")
 
     st.sidebar.subheader("Cycle Parameters")
     symbol = st.sidebar.text_input("Ticker Symbol", value=qe.DEFAULT_SYMBOL)
@@ -206,12 +206,12 @@ def build_sidebar() -> AnalysisParams | None:
 
 def main() -> None:
     st.set_page_config(
-        page_title="Quant Sniper Ultimate",
+        page_title="CycleAnalysis",
         page_icon="📈",
         layout="wide",
     )
-    st.title("Ultimate Quant Sniper")
-    st.caption("Cycle + TD9 + SQZ Momentum + SuperTrend + CMF")
+    st.title("CycleAnalysis")
+    st.caption("Cycle · TD Sequential · Squeeze · SuperTrend · CMF")
 
     params = build_sidebar()
 
@@ -244,7 +244,7 @@ def _render_result(result: dict) -> None:
     st.download_button(
         label="下载 HTML 图表",
         data=html_bytes,
-        file_name=f"{result['symbol']}_quant_sniper.html",
+        file_name=f"{result['symbol']}_cycle_analysis.html",
         mime="text/html",
     )
 

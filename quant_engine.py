@@ -20,7 +20,7 @@ LOOKBACK_STEP       = 10
 DEFAULT_FUTURE_DAYS = 65
 DEFAULT_PERIODS     = [127.0, 227.0, 78.0]#[27.0, 54.0, 81.0]
 PHASING_SCALE       = 209
-DEFAULT_HTML        = str(_BASE / "tmp" / "quant_sniper_v8.html")
+DEFAULT_HTML        = str(_BASE / "tmp" / "cycle_analysis.html")
 YF_CACHE_DIR        = _BASE / "tmp" / "yf_cache"
 PASS_COLOR          = "#59c36a"
 FAIL_COLOR          = "#e36a6a"
@@ -620,7 +620,91 @@ def resolve_cycle_config(
 # ══════════════════════════════════════════════════════════════════════════════
 #  TRADE STATE ENGINE
 # ══════════════════════════════════════════════════════════════════════════════
-def analyze_trade_state(close: pd.Series, low: pd.Series, high: pd.Series, trend: np.ndarray, st_line: np.ndarray, td_signals: list, sqz_val: np.ndarray, cmf_val: pd.Series):
+def describe_cycle_outlook(close: pd.Series, cycle_metrics: dict | None) -> dict:
+    """
+    Summarize the harmonic cycle projection direction for the trade report.
+
+    Returns a dict with:
+      direction : 'up' | 'down' | 'flat' | 'unknown'
+      slope_pct : projection slope per session, in % of current price (relative move)
+      horizon_pct : total move of the cycle line across the projection, in % of price
+      r2, confidence, next_turn_kind, next_turn_days, lines (list[str])
+    The projection is a detrended-cycle line scaled to the price range — it indicates
+    cycle PHASE direction, NOT a price target or probability.
+    """
+    result = {
+        "direction": "unknown", "slope_pct": 0.0, "horizon_pct": 0.0,
+        "r2": 0.0, "confidence": "无", "next_turn_kind": None,
+        "next_turn_days": None, "lines": [],
+    }
+    if not cycle_metrics:
+        return result
+
+    overlay = cycle_metrics.get("overlay")
+    r2 = float(cycle_metrics.get("combined_r2", 0.0))
+    result["r2"] = r2
+    if overlay is None or len(overlay) <= len(close) + 1:
+        result["lines"].append("周期模型: 无未来投影数据，方向未知。")
+        return result
+
+    hist_n = len(close)
+    proj = overlay.iloc[hist_n:]
+    y = np.asarray(proj.values, dtype=float)
+    last_px = float(close.iloc[-1]) or 1.0
+
+    slope = float(np.polyfit(np.arange(len(y)), y, 1)[0])
+    slope_pct = slope / last_px * 100.0
+    horizon_pct = (y[-1] - y[0]) / last_px * 100.0
+    result["slope_pct"] = slope_pct
+    result["horizon_pct"] = horizon_pct
+
+    if slope_pct > 0.02:
+        direction, arrow = "up", "向上 ↑"
+    elif slope_pct < -0.02:
+        direction, arrow = "down", "向下 ↓"
+    else:
+        direction, arrow = "flat", "走平 →"
+    result["direction"] = direction
+
+    if r2 >= 0.5:
+        conf = "高"
+    elif r2 >= 0.35:
+        conf = "中"
+    else:
+        conf = "低(仅参考)"
+    result["confidence"] = conf
+
+    # Next projected turn (peak/trough) from the dashed projection line
+    next_turn_txt = ""
+    extrema = cycle_metrics.get("projection_extrema")
+    if extrema is None:
+        extrema = projection_extrema(overlay, close)
+    if extrema:
+        nxt = extrema[0]
+        kind_cn = "见底(周期低点)" if nxt["kind"] == "trough" else "见顶(周期高点)"
+        result["next_turn_kind"] = nxt["kind"]
+        try:
+            days = int(np.busday_count(close.index[-1].date(), nxt["date"].date()))
+            result["next_turn_days"] = days
+            next_turn_txt = f" 预计约 {days} 个交易日后{kind_cn} ({nxt['date'].date()})。"
+        except Exception:
+            next_turn_txt = f" 下一转折: {kind_cn}。"
+
+    result["lines"].append("── 周期模型 (谐波投影) ──")
+    result["lines"].append(
+        f"周期方向: {arrow} (未来投影斜率 {slope_pct:+.3f}%/日, "
+        f"投影区间累计 {horizon_pct:+.1f}%; 拟合 R²={r2:.2f}, 置信度: {conf})"
+    )
+    if next_turn_txt:
+        result["lines"].append("周期节奏:" + next_turn_txt)
+    result["lines"].append(
+        "说明: 周期线为去趋势谐波按价格分位缩放的结果，只表示周期相位的上/下方向，"
+        "不是价格目标或上涨概率。"
+    )
+    return result
+
+
+def analyze_trade_state(close: pd.Series, low: pd.Series, high: pd.Series, trend: np.ndarray, st_line: np.ndarray, td_signals: list, sqz_val: np.ndarray, cmf_val: pd.Series, cycle_metrics: dict | None = None):
     current_price = float(close.iloc[-1])
     st_support_resist = st_line[-1]
     current_trend = 1 if current_price > st_support_resist else -1
@@ -633,6 +717,9 @@ def analyze_trade_state(close: pd.Series, low: pd.Series, high: pd.Series, trend
     tr = np.maximum(high.values - low.values, np.maximum(np.abs(high.values - np.roll(close.values, 1)), np.abs(low.values - np.roll(close.values, 1))))
     current_atr = pd.Series(tr).rolling(14).mean().iloc[-1]
 
+    cycle = describe_cycle_outlook(close, cycle_metrics)
+    cycle_dir = cycle["direction"]
+
     report = [f"\n▼▼▼量化决策▼▼▼ (最新价: {current_price:.2f})", "═" * 50]
     report.append(f"资金流向 (CMF): {'流入(机构吸筹)' if cmf_current > 0 else '流出(机构派发)'} (CMF: {cmf_current:.3f})")
 
@@ -644,13 +731,23 @@ def analyze_trade_state(close: pd.Series, low: pd.Series, high: pd.Series, trend
         elif current_sqz > prev_sqz and current_sqz > 0:
             if cmf_current > 0:
                 report.append("动能: 量价齐升 (SQZ绿柱 + CMF流入)。")
-                report.append("动作: 【正金字塔加仓】趋势与资金双重共振，可果断突破加仓。")
+                if cycle_dir == "up":
+                    report.append("动作: 【正金字塔加仓】趋势+资金+周期三重共振，可果断突破加仓。")
+                elif cycle_dir == "down":
+                    report.append("动作: 趋势与资金向好，但周期已进入下行相位，加仓宜轻仓/分批，防止追高。")
+                else:
+                    report.append("动作: 【正金字塔加仓】趋势与资金共振，可果断突破加仓。")
             else:
                 report.append("警报: [顶背离风险] 价格上涨但机构资金(CMF)显示流出！")
                 report.append("动作: 停止买入，持股观望，随时准备跌破支撑时离场。")
         else:
             report.append("动能: 动量减弱或震荡阶段。")
-            report.append("动作: 缩量回踩期。重点关注下方支撑。")
+            if cycle_dir == "up":
+                report.append("动作: 缩量回踩期，但周期仍向上，回踩支撑不破可低吸。")
+            elif cycle_dir == "down":
+                report.append("动作: 缩量回踩且周期下行，观望为主，等待周期见底再介入。")
+            else:
+                report.append("动作: 缩量回踩期。重点关注下方支撑。")
         report.append(f"止损/防守线: {st_support_resist:.2f} (SuperTrend 支撑)")
 
     elif current_trend == -1:
@@ -659,11 +756,21 @@ def analyze_trade_state(close: pd.Series, low: pd.Series, high: pd.Series, trend
             left_stop_loss = td_low - current_atr
             report.append("当前状态: [左侧极限] - 趋势向下，但出现反转信号。")
             if cmf_current > 0: report.append("异动: 主力资金(CMF)正在逆势吸筹！")
+            if cycle_dir == "up":
+                report.append("印证: 周期已转向上行相位，与 TD 反转信号形成共振，反弹概率增加。")
+            elif cycle_dir == "down":
+                report.append("注意: 周期仍处下行相位，反弹或为逃命波，严格控制仓位。")
             report.append("动作: 启动【漏斗建仓法】抢反弹，先打 30% 试探底仓。")
             report.append(f"极限止损线: {left_stop_loss:.2f} (破位无条件平仓)")
         else:
             report.append("当前状态: [绝对空头] - 趋势向下，接飞刀的高风险区。")
-            report.append("动作: 【空仓观望】。绝不盲目抄底。")
+            if cycle_dir == "up":
+                report.append("留意: 趋势仍空但周期相位已开始向上，可加入自选观察，等趋势转右侧再动手。")
+            else:
+                report.append("动作: 【空仓观望】。绝不盲目抄底。")
+
+    for line in cycle["lines"]:
+        report.append(line)
 
     report.append("═" * 50 + "\n")
     return "\n".join(report)

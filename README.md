@@ -1,4 +1,4 @@
-# CycleAnalysis / Quant Sniper
+# CycleAnalysis
 
 A browser-based stock charting and analysis tool built on **cycle harmonic fitting**, **TD Sequential**, **Squeeze Momentum**, **SuperTrend**, and **Chaikin Money Flow (CMF)**, powered by Streamlit.
 
@@ -26,7 +26,7 @@ The original desktop app lives at `../nya_V6.py` (Tkinter GUI). This folder is t
 | Path | Purpose |
 |------|---------|
 | `tmp/yf_cache/` | yfinance timezone cache to reduce repeat requests |
-| `tmp/quant_sniper_v8.html` | Default HTML output path from the engine (the web app mainly embeds charts in-page; HTML download is optional) |
+| `tmp/cycle_analysis.html` | Default HTML output path from the engine (the web app mainly embeds charts in-page; HTML download is optional) |
 
 ---
 

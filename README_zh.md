@@ -1,8 +1,10 @@
-# CycleAnalysis / Quant Sniper
+# CycleAnalysis
 
-基于周期分析的股票量化图表工具，整合 **Cycle 谐波拟合**、**TD Sequential**、**Squeeze Momentum**、**SuperTrend** 与 **Chaikin Money Flow (CMF)**，通过 Streamlit 在浏览器中运行。
+基于周期分析的股票图表工具，整合 **Cycle 谐波拟合**、**TD Sequential**、**Squeeze Momentum**、**SuperTrend** 与 **Chaikin Money Flow (CMF)**，通过 Streamlit 在浏览器中运行。
 
-> English documentation: [README_EN.md](README_EN.md)
+> English documentation: [README.md](README.md)  
+> **模型/引擎深度说明（DFE、周期选择、拟合与决策）：** [MODEL_DETAIL_zh.md](MODEL_DETAIL_zh.md)  
+> **周期天数单独详解（怎么从频谱算出来）：** [CYCLE_CALCULATION_zh.md](CYCLE_CALCULATION_zh.md)
 
 原版桌面程序为 `../nya_V6.py`（Tkinter GUI），本目录为 Web 部署版本，引擎逻辑与桌面版一致。
 
@@ -12,6 +14,8 @@
 
 | 文件 | 作用 |
 |------|------|
+| **`MODEL_DETAIL_zh.md`** | **主代码深度说明**。端到端流水线、DFE 频谱选周期、lookback 稳定性扫描、谐波拟合与投影、各指标与量化决策树。 |
+| **`CYCLE_CALCULATION_zh.md`** | **周期计算专文**。周期天数如何从去趋势残差 + periodogram 得到；手动 / DFE / fallback 三种来源；与 lookback、252 拟合窗的关系。 |
 | **`streamlit_app.py`** | **应用入口**。Streamlit Community Cloud 的 Main file path 应指向此文件。负责侧边栏参数 UI、调用分析流程、展示 Plotly 图表、引擎日志与 HTML 下载按钮。 |
 | **`quant_engine.py`** | **量化引擎**（从 `nya_V6.py` 抽取，无 GUI 依赖）。包含数据下载、周期检测 (DFE)、lookback 优选、指标计算、交易状态分析与 Plotly 图表构建。云端与本地分析的核心逻辑均在此文件。 |
 | **`nya_V6_backup.py`** | **原版完整备份**。`TD9ETC/nya_V6.py` 的副本，供对照或回滚；不参与 Web 应用运行。 |
@@ -26,7 +30,7 @@
 | 路径 | 作用 |
 |------|------|
 | `tmp/yf_cache/` | yfinance 时区缓存，减少重复请求 |
-| `tmp/quant_sniper_v8.html` | 引擎默认 HTML 输出路径（Web 版主要通过页面内嵌图表展示，可选下载 HTML） |
+| `tmp/cycle_analysis.html` | 引擎默认 HTML 输出路径（Web 版主要通过页面内嵌图表展示，可选下载 HTML） |
 
 ---
 
