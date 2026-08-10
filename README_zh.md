@@ -57,7 +57,19 @@ HarmonicCycleLab/
 
 ## 参考
 
-Hurst（1970）周期择时；DeMark（1994）Sequential；Wilder（1978）ATR；Chaikin / Achelis 资金流；Carter *Mastering the Trade*（Squeeze）；Oppenheim & Schafer（频谱背景）。图上 Squeeze / SuperTrend 对齐常见 TradingView 公开脚本实现。
+Achelis, S. B. (2001). *Technical analysis from A to Z* (2nd ed.). McGraw-Hill. (ISBN 978-0-07-136348-8) — Chaikin Money Flow
+
+Carter, J. F. (2005). *Mastering the trade: Proven techniques for profiting from intraday and swing trading setups*. McGraw-Hill. (ISBN 978-0-07-145958-7) — Squeeze（布林缩进肯特纳）
+
+DeMark, T. R. (1994). *The new science of technical analysis*. John Wiley & Sons. (ISBN 978-0-471-03548-0) — TD Sequential
+
+Hurst, J. M. (1970). *The profit magic of stock transaction timing*. Prentice-Hall. (ISBN 978-0-13-095075-8) — 周期择时
+
+Seban, O. (2009). *Tout le monde mérite d'être riche* (2nd ed.). Maxima. (ISBN 978-2-84001-618-2) — SuperTrend
+
+Welch, P. D. (1967). The use of fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms. *IEEE Transactions on Audio and Electroacoustics, 15*(2), 70–73. https://doi.org/10.1109/TAU.1967.1161901 — periodogram（DFE 所用）
+
+Wilder, J. W., Jr. (1978). *New concepts in technical trading systems*. Trend Research. (ISBN 978-0-89459-027-6) — ATR（SuperTrend 输入）
 
 非投资建议。回测省略实盘摩擦，且容易过拟合。
 
