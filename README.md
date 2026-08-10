@@ -57,19 +57,19 @@ Chinese: `*.zh.md` next to each file.
 
 ## References
 
-Achelis, S. B. (2001). *Technical analysis from A to Z* (2nd ed.). McGraw-Hill. (ISBN 978-0-07-136348-8) — Chaikin Money Flow
+Achelis, S. B. (2001). *Technical analysis from A to Z* (2nd ed.). McGraw-Hill. (ISBN 978-0-07-136348-8) 
 
-Carter, J. F. (2005). *Mastering the trade: Proven techniques for profiting from intraday and swing trading setups*. McGraw-Hill. (ISBN 978-0-07-145958-7) — Squeeze (BB inside Keltner)
+Carter, J. F. (2005). *Mastering the trade: Proven techniques for profiting from intraday and swing trading setups*. McGraw-Hill. (ISBN 978-0-07-145958-7)
 
-DeMark, T. R. (1994). *The new science of technical analysis*. John Wiley & Sons. (ISBN 978-0-471-03548-0) — TD Sequential
+DeMark, T. R. (1994). *The new science of technical analysis*. John Wiley & Sons. (ISBN 978-0-471-03548-0) 
 
-Hurst, J. M. (1970). *The profit magic of stock transaction timing*. Prentice-Hall. (ISBN 978-0-13-095075-8) — cycle timing
+Hurst, J. M. (1970). *The profit magic of stock transaction timing*. Prentice-Hall. (ISBN 978-0-13-095075-8) 
 
-Seban, O. (2009). *Tout le monde mérite d'être riche* (2nd ed.). Maxima. (ISBN 978-2-84001-618-2) — SuperTrend
+Seban, O. (2009). *Tout le monde mérite d'être riche* (2nd ed.). Maxima. (ISBN 978-2-84001-618-2) 
 
-Welch, P. D. (1967). The use of fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms. *IEEE Transactions on Audio and Electroacoustics, 15*(2), 70–73. https://doi.org/10.1109/TAU.1967.1161901 — periodogram (used by DFE)
+Welch, P. D. (1967). The use of fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms. *IEEE Transactions on Audio and Electroacoustics, 15*(2), 70–73. https://doi.org/10.1109/TAU.1967.1161901
 
-Wilder, J. W., Jr. (1978). *New concepts in technical trading systems*. Trend Research. (ISBN 978-0-89459-027-6) — ATR (input to SuperTrend)
+Wilder, J. W., Jr. (1978). *New concepts in technical trading systems*. Trend Research. (ISBN 978-0-89459-027-6) 
 
 Not investment advice. Backtests skip live frictions and can overfit.
 
