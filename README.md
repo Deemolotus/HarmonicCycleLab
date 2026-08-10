@@ -46,12 +46,6 @@ In-sample grid-best Sharpe (same sample that chose the weights — not OOS):
 | IWM | Fixed + grid | 0.47 | 0.84 | +174% | +145% |
 | XLK | DFE + grid | 0.94 | 1.17 | +237% | +781% |
 
-Across 15 names, DFE+grid wins on Sharpe 8 times, fixed+grid 7; cycle-only never. Strong bull ETFs often lose absolute return to cash periods even when Sharpe rises. Full tables and DFE / cycle-only cuts are in the report.
-
-## Streamlit Cloud
-
-Push to GitHub → [share.streamlit.io](https://share.streamlit.io) → main file `streamlit_app.py`. No secrets (public Yahoo data).
-
 ## Docs
 
 - [model-guide.md](docs/model-guide.md) — pipeline

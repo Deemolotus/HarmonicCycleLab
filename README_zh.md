@@ -46,12 +46,6 @@ HarmonicCycleLab/
 | IWM | 固定 + 网格 | 0.47 | 0.84 | +174% | +145% |
 | XLK | DFE + 网格 | 0.94 | 1.17 | +237% | +781% |
 
-15 个标的里 DFE+网格赢夏普 8 次、固定+网格 7 次；仅周期从未夺冠。强牛宽基常因空仓段丢掉绝对收益。完整表与消融在报告正文。
-
-## 部署到 Streamlit Cloud
-
-推 GitHub → [share.streamlit.io](https://share.streamlit.io) → Main file 填 `streamlit_app.py`。不用配 Secrets。
-
 ## 文档
 
 - [model-guide.zh.md](docs/model-guide.zh.md)
